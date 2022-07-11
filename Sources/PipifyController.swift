@@ -93,7 +93,10 @@ public final class PipifyController: NSObject, ObservableObject, AVPictureInPict
             // limit the number of times we redraw per second (performance)
             .throttle(for: .init(1.0 / maximumUpdatesPerSecond), scheduler: RunLoop.main, latest: true)
             .sink { [weak self] _ in
-                self?.render(view: modifiedView, using: renderer)
+                guard let self = self else { return }
+                renderer.proposedSize = ProposedViewSize(width: self.renderSize.width * UIScreen.main.scale,
+                                                         height: self.renderSize.height * UIScreen.main.scale)
+                self.render(view: modifiedView, using: renderer)
             }
             .store(in: &rendererSubscriptions)
         
